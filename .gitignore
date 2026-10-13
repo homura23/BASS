@@ -17,6 +17,12 @@ results/
 *.m4a
 *.flac
 
+# The two public release checkpoints are explicitly allow-listed below.
+weights/*
+!weights/README.md
+!weights/carla_r0_final.pt
+!weights/carla_r1_final.pt
+
 # Local datasets and generated manifests
 data/**/*.csv
 data/**/*.json

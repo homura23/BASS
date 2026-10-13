@@ -71,7 +71,7 @@ scripts/train_r1.sh \
   --out-dir runs/r1
 ```
 
-Configure optional noise and room-response directories in a local copy of `config/r1.yaml when those resources are available. Do not commit the resources or their manifests.
+Configure optional noise and room-response directories in a local copy of `config/r1.yaml` when those resources are available. Do not commit the resources or their manifests.
 
 Evaluate a checkpoint on a CSV split:
 
@@ -81,6 +81,31 @@ scripts/test_model.sh \
   --csv $DATA_ROOT/test.csv \
   --out runs/r1/test.jsonl
 ```
+
+The final public base checkpoints are included in `weights/`. They were
+publicized with portable paths and contain no optimizer state or experiment
+logs. For one audio file:
+
+```bash
+scripts/test_single_audio.py \
+  --checkpoint weights/carla_r1_final.pt \
+  --audio $DATA_ROOT/example.wav \
+  --device cuda:0
+```
+
+For a batch CSV, following the same `full_path,label` contract as SOFIA:
+
+```bash
+scripts/test_batch_audio.py \
+  --checkpoint weights/carla_r1_final.pt \
+  --csv $DATA_ROOT/test.csv \
+  --output /tmp/carla_r1_test.jsonl \
+  --device cuda:0
+```
+
+Both commands use the external SOFIA encoders through `SOFIA_ROOT`. The batch
+result should be written outside the repository; `--output` is intentionally
+explicit so runtime predictions are not committed with the source tree.
 
 Embedding caches can be built with `scripts/build_csv_embedding_cache.py`; cache files are local runtime artifacts and are ignored by Git.
 
@@ -112,4 +137,4 @@ python -m freya_pro.eval.bank --help
 - `scripts/`: main training, testing, and cache entry points
 - `tests/`: dependency-light public contract tests
 
-No personal paths, private data, intermediate results, execution logs, or model weights should be committed.
+No personal paths, private data, intermediate results, or execution logs should be committed. The only model weights tracked in this public release are the two explicitly named final R0/R1 checkpoints under `weights/`.
