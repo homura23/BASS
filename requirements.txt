@@ -1,0 +1,47 @@
+# CARLA/FREYA-PRO dependency lock for the MONICA environment.
+#
+# Tested with:
+#   Python 3.10.20
+#   PyTorch CUDA build: torch 2.5.1, CUDA 12.1
+#   torchaudio 2.5.1+cu121
+#
+# Install the matching PyTorch/torchaudio pair before running CARLA. The
+# +cu121 suffix records the exact MONICA wheel; replace the pair together when
+# using another CUDA or CPU build.
+
+torch==2.5.1
+torchaudio==2.5.1+cu121
+
+# CARLA model, data, configuration, and evaluation code.
+numpy==2.2.6
+PyYAML==6.0.3
+
+# Official SOFIA runtime modules used by CARLA:
+# FxPP uses the torchlibrosa implementation; MuQ uses these packages.
+transformers==4.35.0
+huggingface-hub==0.17.3
+tokenizers==0.14.1
+safetensors==0.7.0
+muq==0.1.0
+easydict==1.13
+einops==0.8.2
+nnAudio==0.3.4
+torchlibrosa==0.1.0
+
+# Audio decoding/resampling and SOFIA/MuQ audio utilities.
+soundfile==0.13.1
+librosa==0.11.0
+soxr==1.1.0
+scipy==1.15.3
+tqdm==4.67.3
+
+# R1 RandAugment codec operations.
+encodec==0.1.1
+descript-audio-codec==1.0.0
+
+# Public contract and regression tests.
+pytest==9.1.1
+
+# External, non-Python requirements:
+#   - SOFIA checkout plus its third_party/ pretrained encoder weights
+#   - ffmpeg executable for the codec_roundtrip augmentation

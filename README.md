@@ -30,13 +30,17 @@ See the [official SOFIA README](https://github.com/homura23/SOFIA#readme) for th
 
 ## Install
 
-From the CARLA repository root:
+From the CARLA repository root, the exact versions used in the MONICA
+validation environment are listed in `requirements.txt`:
 
 ```bash
-python -m pip install -e ".[sofia,dev]"
+python -m pip install -r requirements.txt
+python -m pip install -e . --no-deps
 ```
 
-Use a PyTorch installation appropriate for the target CPU/GPU and CUDA runtime.
+The lock file records the CUDA 12.1 PyTorch pair used for validation. For a
+different CPU/CUDA target, install a matching `torch`/`torchaudio` pair
+together and update those two entries accordingly.
 
 ## Dataset CSV
 
