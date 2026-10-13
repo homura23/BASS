@@ -1,0 +1,3 @@
+# Stage-2 support-only LoRA defaults for an R1 checkpoint.
+extends: r1.yaml
+model_version: r1

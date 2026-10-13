@@ -1,0 +1,45 @@
+# Runtime output and large local artifacts
+.cache/
+.tmp/
+cache/
+checkpoint/
+checkpoints/
+runs/
+logs/
+results/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.th
+*.wav
+*.mp3
+*.m4a
+*.flac
+
+# Local datasets and generated manifests
+data/**/*.csv
+data/**/*.json
+data/**/*.jsonl
+!data/examples/
+!data/examples/*.csv
+!data/examples/*.json
+!data/examples/*.jsonl
+
+# Python and tooling
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Local configuration and credentials
+.env
+.env.*
+*.local.yaml
+*.local.yml
+.DS_Store

@@ -1,0 +1,32 @@
+# Public CARLA R1 configuration: R0 architecture plus real-only RandAugment.
+extends: r0.yaml
+
+model_version: r1
+
+robustness:
+  resources:
+    # Optional directories. Leave empty to use only operations without external resources.
+    demand_dir: ""
+    rir_dir: ""
+  randaugment:
+    enabled: true
+    num_layers: 1
+    apply_probability: 0.9
+    family_balanced: false
+    allow_length_change: true
+    sample_rate: 44100
+    segment_seconds: 0.0
+    max_batch_duration_seconds: 60.0
+    crop_mode: random
+    eval_crop_mode: center
+    apply_to_model_window: true
+    batch_size: 8
+    validation_batch_size: 8
+    num_workers: 4
+    validation_num_workers: 2
+    base_epochs: 10
+    base_lr: 0.0005
+    base_aug_weight: 1.0
+    weight_decay: 0.0001
+    max_grad_norm: 50.0
+    progress_interval_batches: 10

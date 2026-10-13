@@ -1,0 +1,19 @@
+# Shared R1 RandAugment settings used by optional Stage-2 support augmentation.
+extends: ../r1.yaml
+
+robustness:
+  resources:
+    demand_dir: ""
+    rir_dir: ""
+  randaugment:
+    enabled: true
+    num_layers: 1
+    apply_probability: 0.9
+    family_balanced: false
+    allow_length_change: true
+    sample_rate: 44100
+    segment_seconds: 0.0
+    max_batch_duration_seconds: 60.0
+    crop_mode: random
+    eval_crop_mode: center
+    apply_to_model_window: true

@@ -1,0 +1,3 @@
+full_path,label,source
+audio/real_test_0001.wav,0,real
+audio/fake_test_0001.wav,1,example-generator

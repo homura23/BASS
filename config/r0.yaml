@@ -1,0 +1,106 @@
+# Public CARLA R0 configuration.
+# Dataset CSV paths are intentionally project-relative placeholders.
+model_version: r0
+seed: 42
+device: auto
+
+data:
+  train_csv: data/examples/train.csv
+  val_csv: data/examples/validation.csv
+  base_sample_rate: 44100
+  segment_seconds: 0
+  max_batch_duration_seconds: 60.0
+  normalize: true
+  mono: false
+  random_crop: true
+  crop_mode: random
+  eval_crop_mode: center
+  auto_convert_mp3: true
+  audio_cache_dir: null
+  batch_size: 8
+  num_workers: 4
+  strict_audio: true
+
+training:
+  epochs: 10
+  lr: 0.0005
+  betas: [0.9, 0.98]
+  weight_decay: 0.0001
+  max_grad_norm: 50.0
+
+fusion:
+  projector_dim: 256
+  fusion_hidden: [512]
+  fusion_out: 256
+  dropout: 0.1
+  l2_norm: false
+  mode: moe
+  moe_routing: dense
+  top_k: 1
+
+flow:
+  dim: 256
+  K: 8
+  hidden: 512
+  R: 5.0
+  permutation: reverse
+
+fewshot:
+  lora:
+    targets: [experts, projectors]
+    rank: 4
+    alpha: 16
+    dropout: 0.0
+  shots: [5, 10, 20, 50, 100]
+  seeds: [42, 43, 44]
+  max_steps: 500
+  eval_every: 50
+  patience: 4
+  min_delta: 0.0001
+  lr: 0.0001
+  weight_decay: 0.0001
+  bank:
+    router: support_prototype_cosine
+    top_k: 3
+    temperature: 0.1
+    normalize_nll: true
+
+encoder_compatibility:
+  mode: sofia_legacy
+  initialization_seed: 42
+  sofia_root: null
+
+# These paths are relative to SOFIA_ROOT, not CARLA.
+audio_branches:
+  fxpp:
+    enabled: true
+    weights: third_party/fxencoder_plusplus/fxenc_plusplus_default.pt
+    repo_path: third_party/fxencoder_plusplus
+    target_sr: 44100
+    channels: 2
+    embed_dim: 128
+    device: auto
+  muq:
+    enabled: true
+    weights: third_party/muq_weights
+    repo_path: third_party/muq
+    target_sr: 24000
+    channels: 1
+    embed_dim: 1024
+    device: auto
+  mert:
+    enabled: true
+    weights: third_party/mert
+    target_sr: 24000
+    channels: 1
+    embed_dim: 768
+    layer_pooling: layer_mean
+    device: auto
+  wave:
+    enabled: true
+    weights: third_party/wav2vec
+    target_sr: 16000
+    channels: 1
+    embed_dim: 768
+    layer_pooling: layer_mean
+    device: auto

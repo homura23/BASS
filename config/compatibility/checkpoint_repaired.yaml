@@ -1,0 +1,6 @@
+# Optional repaired encoder checkpoint mode. This changes the feature space.
+extends: ../r0.yaml
+
+encoder_compatibility:
+  mode: checkpoint_repaired
+  initialization_seed: 42

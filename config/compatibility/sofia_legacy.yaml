@@ -1,0 +1,6 @@
+# Reproduce the official SOFIA-compatible feature initialization.
+extends: ../r0.yaml
+
+encoder_compatibility:
+  mode: sofia_legacy
+  initialization_seed: 42

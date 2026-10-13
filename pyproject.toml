@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "carla-freya-pro"
+version = "0.1.0"
+description = "CARLA: the public R0/R1 model and training pipeline for FREYA-NF v1"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pyyaml",
+  "torch",
+  "torchaudio",
+]
+
+[project.optional-dependencies]
+sofia = [
+  "transformers>=4.40",
+  "soundfile",
+]
+dev = ["pytest>=8"]
+rawnet3 = ["soundfile", "asteroid-filterbanks"]
+robustdetector = ["nnAudio", "soxr"]
+neural-codecs = ["encodec==0.1.1", "descript-audio-codec==1.0.0"]
+
+[tool.setuptools.packages.find]
+include = ["freya_pro*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
