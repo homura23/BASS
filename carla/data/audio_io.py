@@ -64,7 +64,7 @@ def _project_root() -> Path:
 
 
 def _default_runtime_tmpdir() -> Path:
-    """Return a project-local temporary directory, never container /tmp."""
+    """Return a project-local temporary directory, never the system temporary directory."""
 
     configured = os.environ.get("CARLA_TMPDIR")
     root = Path(configured).expanduser() if configured else _project_root() / ".tmp" / "carla"

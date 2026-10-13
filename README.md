@@ -32,7 +32,7 @@ CARLA does not vendor the external encoder source or pretrained files. Place a
 SOFIA checkout next to this repository as ../sofia, or set SOFIA_ROOT:
 
 ~~~bash
-export SOFIA_ROOT=/path/to/sofia
+export SOFIA_ROOT=../sofia
 ~~~
 
 These paths must exist relative to SOFIA_ROOT:
@@ -91,8 +91,8 @@ Train R0:
 
 ~~~bash
 scripts/train_r0.sh \
-  --train-csv /path/to/train.csv \
-  --val-csv /path/to/validation.csv \
+  --train-csv data/train.csv \
+  --val-csv data/validation.csv \
   --out_dir runs/r0
 ~~~
 
@@ -101,8 +101,8 @@ Train R1 from R0:
 ~~~bash
 scripts/train_r1.sh \
   --base runs/r0/carla_r0_best.pt \
-  --train-csv /path/to/real_train.csv \
-  --val-csv /path/to/real_validation.csv \
+  --train-csv data/real_train.csv \
+  --val-csv data/real_validation.csv \
   --out-dir runs/r1
 ~~~
 
@@ -116,8 +116,8 @@ CSV evaluation:
 ~~~bash
 scripts/test_model.sh \
   --base weights/carla_r1_final.pt \
-  --csv /path/to/test.csv \
-  --out /tmp/carla_r1_test.jsonl \
+  --csv data/test.csv \
+  --out runtime_outputs/carla_r1_test.jsonl \
   --device cuda:0
 ~~~
 
@@ -126,7 +126,7 @@ One audio file:
 ~~~bash
 scripts/test_single_audio.py \
   --checkpoint weights/carla_r1_final.pt \
-  --audio /path/to/example.wav \
+  --audio data/example.wav \
   --device cuda:0
 ~~~
 
@@ -135,12 +135,12 @@ Batch audio:
 ~~~bash
 scripts/test_batch_audio.py \
   --checkpoint weights/carla_r1_final.pt \
-  --csv /path/to/test.csv \
-  --output /tmp/carla_r1_batch.jsonl \
+  --csv data/test.csv \
+  --output runtime_outputs/carla_r1_batch.jsonl \
   --device cuda:0
 ~~~
 
-The inference outputs are written outside the repository. Both audio scripts
+The inference outputs use the ignored runtime_outputs/ directory and are not committed. Both audio scripts
 use the full_path,label contract and the four external encoder branches.
 Embedding caches are local runtime artifacts and should remain outside Git.
 
@@ -149,9 +149,9 @@ Embedding caches are local runtime artifacts and should remain outside Git.
 ~~~bash
 scripts/train_lora.sh \
   --base weights/carla_r1_final.pt \
-  --support /path/to/support.csv \
+  --support data/support.csv \
   --generator example-generator \
-  --out-dir /tmp/carla_lora/example-generator
+  --out-dir runtime_outputs/carla_lora/example-generator
 ~~~
 
 Validation and test splits must not be passed to this support-only trainer.

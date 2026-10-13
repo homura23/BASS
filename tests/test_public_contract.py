@@ -49,7 +49,7 @@ def test_public_configs_are_relative():
 
         values = list(visit(value))
         assert not any(item.startswith("/") for item in values), path
-        assert not any("25AW30" in item for item in values), path
+        assert not any(("25" + "AW30") in item for item in values), path
 
 
 def test_source_has_no_machine_specific_absolute_paths():
@@ -59,7 +59,7 @@ def test_source_has_no_machine_specific_absolute_paths():
     ]
     for path in candidates:
         text = path.read_text(encoding="utf-8", errors="ignore")
-        machine_path = "/" + "25AW30"
+        machine_path = "25" + "AW30"
         assert machine_path not in text, path
-        root_cache = "/" + "root/"
+        root_cache = "r" + "oot/"
         assert root_cache not in text, path

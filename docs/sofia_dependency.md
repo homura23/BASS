@@ -7,7 +7,7 @@ local caches.
 Set SOFIA_ROOT to the checkout, or place it next to CARLA as ../sofia:
 
 ~~~bash
-export SOFIA_ROOT=/path/to/sofia
+export SOFIA_ROOT=../sofia
 ~~~
 
 CARLA resolves these paths relative to SOFIA_ROOT:
