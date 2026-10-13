@@ -1,9 +1,8 @@
-"""Project-relative bridge to the official SOFIA runtime package.
+"""Project-relative bridge to the external SOFIA runtime package.
 
 CARLA does not redistribute SOFIA source or pretrained weights. Set
-``SOFIA_ROOT`` to a checkout of https://github.com/homura23/SOFIA, or place a
-sibling checkout next to CARLA. Weight paths in CARLA configs are relative to
-that SOFIA checkout, matching the official SOFIA README.
+``SOFIA_ROOT`` to an existing SOFIA checkout, or place a sibling checkout
+next to CARLA. Weight paths in CARLA configs are relative to that checkout.
 """
 from __future__ import annotations
 
@@ -20,15 +19,15 @@ def default_sofia_root() -> Path:
     configured = os.environ.get("SOFIA_ROOT")
     if configured:
         return Path(configured).expanduser().resolve()
-    # <code>/CARLA/freya_pro/utils/sofia_bridge.py -> <code>/sofia
+    # <code>/CARLA/carla/utils/sofia_bridge.py -> <code>/sofia
     return Path(__file__).resolve().parents[2].parent / "sofia"
 
 
 SOFIA_ROOT = default_sofia_root()
 if not SOFIA_ROOT.is_dir():
     raise ModuleNotFoundError(
-        "SOFIA is not available. Clone https://github.com/homura23/SOFIA "
-        "and set SOFIA_ROOT to that checkout."
+        "SOFIA is not available. Set SOFIA_ROOT to an existing SOFIA checkout "
+        "or place one next to CARLA."
     )
 if str(SOFIA_ROOT.parent) not in sys.path:
     sys.path.insert(0, str(SOFIA_ROOT.parent))

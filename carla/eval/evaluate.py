@@ -12,7 +12,7 @@ from ..data.dataset import make_audio_loader
 from ..data.embedding_cache import (
     build_csv_embedding_cache, load_csv_embedding_cache, save_embedding_cache,
 )
-from ..models.loader import load_pro_checkpoint
+from ..models.loader import load_carla_checkpoint
 from ..models.lora import load_lora_checkpoint
 from ..utils.config import resolve_device
 from ..utils.run_io import atomic_output_path, model_fingerprint, public_path, publicize_row, sha256_file
@@ -40,7 +40,7 @@ def main() -> None:
                         help="Historical output only; formal protocol uses JSONL")
     args = parser.parse_args()
     device = resolve_device(args.device)
-    model, cfg = load_pro_checkpoint(args.base, device)
+    model, cfg = load_carla_checkpoint(args.base, device)
     if args.lora:
         load_lora_checkpoint(model, args.lora, base_checkpoint=args.base, strict=True)
     model.eval()

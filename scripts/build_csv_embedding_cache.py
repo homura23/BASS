@@ -13,19 +13,19 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from freya_pro.data.embedding_cache import (
+from carla.data.embedding_cache import (
     build_csv_embedding_cache, save_embedding_cache,
     validate_csv_embedding_cache_metadata,
 )
-from freya_pro.utils.config import load_config, resolve_device
-from freya_pro.utils.sofia_bridge import build_encoders
+from carla.utils.config import load_config, resolve_device
+from carla.utils.sofia_bridge import build_encoders
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--config", help="YAML configuration used by the model")
-    source.add_argument("--checkpoint", help="FREYA-PRO checkpoint whose embedded config is authoritative")
+    source.add_argument("--checkpoint", help="CARLA checkpoint whose embedded config is authoritative")
     parser.add_argument("--csv", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--crop-mode", choices=["start", "center"], required=True)

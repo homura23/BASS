@@ -59,7 +59,7 @@ def _project_root() -> Path:
     configured = os.environ.get("CARLA_PROJECT_ROOT")
     if configured:
         return Path(configured).expanduser()
-    # audio_io.py lives at <project>/freya_pro/data/audio_io.py.
+    # audio_io.py lives at <project>/carla/data/audio_io.py.
     return Path(__file__).resolve().parents[2]
 
 
@@ -67,7 +67,7 @@ def _default_runtime_tmpdir() -> Path:
     """Return a project-local temporary directory, never container /tmp."""
 
     configured = os.environ.get("CARLA_TMPDIR")
-    root = Path(configured).expanduser() if configured else _project_root() / ".tmp" / "freya_pro"
+    root = Path(configured).expanduser() if configured else _project_root() / ".tmp" / "carla"
     root.mkdir(parents=True, exist_ok=True)
     return root
 
@@ -85,7 +85,7 @@ def _load_with_ffmpeg(path: Path, audio) -> tuple[torch.Tensor, int]:
         raise RuntimeError("ffmpeg is unavailable for audio decode fallback")
     temp_root = str(_default_runtime_tmpdir())
     timeout = float(os.environ.get("CARLA_AUDIO_DECODE_TIMEOUT", "120"))
-    with tempfile.TemporaryDirectory(prefix="freya_decode_", dir=temp_root) as directory:
+    with tempfile.TemporaryDirectory(prefix="carla_decode_", dir=temp_root) as directory:
         decoded = Path(directory) / "decoded.wav"
         command = [
             ffmpeg,
@@ -118,7 +118,7 @@ def default_audio_cache_dir() -> Path:
     if cache_root:
         return Path(cache_root).expanduser() / "wav"
     # Use an explicit cache root or a project-local cache directory.
-    return _project_root() / ".cache" / "freya_pro" / "wav"
+    return _project_root() / ".cache" / "carla" / "wav"
 
 
 def _source_fingerprint(path: Path) -> dict[str, Any]:

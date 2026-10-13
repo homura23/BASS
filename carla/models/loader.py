@@ -6,7 +6,7 @@ from typing import Any, Dict, Mapping, Tuple
 import torch
 
 from .flow import VectorGlow
-from .model import FreyaPro
+from .model import CarlaModel
 from .robustness import FusionWrapper
 from ..utils.sofia_bridge import build_fusion
 from ..utils.run_io import torch_save_atomic
@@ -23,11 +23,11 @@ def build_flow(cfg: Dict, device: torch.device) -> VectorGlow:
     ).to(device)
 
 
-def build_model(cfg: Dict, device: torch.device, variant: str | None = None) -> FreyaPro:
+def build_model(cfg: Dict, device: torch.device, variant: str | None = None) -> CarlaModel:
     fusion = build_fusion(cfg, device)
     version = variant or str(cfg.get("model_version", "r0"))
     wrapped = FusionWrapper(fusion, version=version)
-    return FreyaPro(wrapped, build_flow(cfg, device)).to(device)
+    return CarlaModel(wrapped, build_flow(cfg, device)).to(device)
 
 
 def validate_base_feature_contract(
@@ -47,7 +47,7 @@ def validate_base_feature_contract(
 
 def load_base_v1(
     checkpoint: str, cfg: Dict, device: torch.device, variant: str | None = None
-) -> FreyaPro:
+) -> CarlaModel:
     state = torch.load(checkpoint, map_location="cpu", weights_only=False)
     if state.get("arch", "v1") != "v1":
         raise ValueError(f"CARLA currently builds on v1 only; checkpoint arch={state.get('arch')!r}")
@@ -58,8 +58,8 @@ def load_base_v1(
     return model
 
 
-def save_pro_checkpoint(
-    path: str, model: FreyaPro, cfg: Dict, *, stage: str, epoch: int = 0,
+def save_carla_checkpoint(
+    path: str, model: CarlaModel, cfg: Dict, *, stage: str, epoch: int = 0,
     metadata: Dict[str, Any] | None = None,
     optimizer: torch.optim.Optimizer | None = None,
     training_state: Dict[str, Any] | None = None,
@@ -80,7 +80,7 @@ def save_pro_checkpoint(
     })
 
 
-def load_pro_checkpoint(checkpoint: str, device: torch.device) -> Tuple[FreyaPro, Dict]:
+def load_carla_checkpoint(checkpoint: str, device: torch.device) -> Tuple[CarlaModel, Dict]:
     state = torch.load(checkpoint, map_location="cpu", weights_only=False)
     project = state.get("project")
     if project != "CARLA":

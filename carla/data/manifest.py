@@ -91,7 +91,7 @@ def derive_seed(master_seed: int, *parts: object) -> int:
 
 
 def read_track_csv(path: str | Path) -> list[TrackRecord]:
-    """Read FREYA-style CSVs and preserve optional grouping columns."""
+    """Read CARLA-style CSVs and preserve optional grouping columns."""
 
     records: list[TrackRecord] = []
     with Path(path).open("r", encoding="utf-8", newline="") as handle:

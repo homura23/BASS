@@ -1,144 +1,170 @@
-# CARLA / FREYA-PRO
+# CARLA
 
-CARLA is the public R0/R1 implementation of the FREYA-NF v1 audio deepfake detection pipeline. It contains the model framework, training code, frozen-encoder cache utilities, support-only LoRA adaptation, and evaluation entry points.
+CARLA is a public audio deepfake detection pipeline. It contains the R0/R1
+model framework, training and evaluation entry points, frozen-encoder cache
+utilities, and support-only adaptation code.
 
-The repository intentionally excludes private datasets, checkpoints, logs, intermediate caches, experiment reports, and paper-result tables. Unpublished internal model variants are not part of the public release.
+Private datasets, manifests, execution logs, intermediate caches, experiment
+reports, ablation variants, and paper-result tables are excluded. Only the
+final public R0 and R1 base checkpoints are stored in weights/.
 
-## Dependency on SOFIA
+## Encoder architecture
 
-CARLA uses the official SOFIA encoders and fusion implementation as an external dependency. SOFIA source code and pretrained weights are not vendored here.
+CARLA uses four frozen audio encoder branches during feature extraction. The
+encoder wrappers and pretrained files are supplied by an external SOFIA
+checkout; CARLA supplies the bridge, configuration, fusion model, density flow,
+training code, and testing scripts.
 
-1. Clone the official repository:
+| Branch | Input | Output | Role |
+| --- | --- | --- | --- |
+| FxEncoder++ | stereo, 44.1 kHz | 128 dimensions | timbral and music-texture representation |
+| MuQ | mono, 24 kHz | 1024 dimensions | music representation |
+| MERT | mono, 24 kHz | 768 dimensions | transformer music/audio representation |
+| Wav2Vec2 | mono, 16 kHz | 768 dimensions | general speech/audio representation |
 
-   ```bash
-   git clone https://github.com/homura23/SOFIA ../sofia
-   export SOFIA_ROOT="$PWD/../sofia"
-   ```
+The four embeddings are passed to a multi-branch mixture-of-experts fusion
+module and then to the CARLA density flow. The public R0/R1 models use these
+four branches only.
 
-2. Follow the official SOFIA README to install its transitive dependencies and place the pretrained files under its `third_party/` tree.
+## External encoder setup
 
-CARLA expects these paths relative to `SOFIA_ROOT`:
+CARLA does not vendor the external encoder source or pretrained files. Place a
+SOFIA checkout next to this repository as ../sofia, or set SOFIA_ROOT:
 
-- `third_party/fxencoder_plusplus/fxenc_plusplus_default.pt`
-- `third_party/muq_weights/`
-- `third_party/mert/`
-- `third_party/wav2vec/`
+~~~bash
+export SOFIA_ROOT=/path/to/sofia
+~~~
 
-The compatibility configuration defaults to the legacy SOFIA feature initialization used by the original pipeline. The repaired checkpoint mode is available separately and represents a different feature space.
+These paths must exist relative to SOFIA_ROOT:
 
-See the [official SOFIA README](https://github.com/homura23/SOFIA#readme) for the authoritative dependency and weight instructions.
+~~~text
+third_party/fxencoder_plusplus/fxenc_plusplus_default.pt
+third_party/muq_weights/model.safetensors
+third_party/muq_weights/pytorch_model.bin
+third_party/mert/pytorch_model.bin
+third_party/mert/MERT-v1-95M_fairseq.pt
+third_party/wav2vec/pytorch_model.bin
+~~~
+
+CARLA resolves these paths through SOFIA_ROOT. The public checkpoints use the
+checkpoint_repaired encoder compatibility mode. Install the external
+checkout's Python dependencies and model files before inference.
 
 ## Install
 
-From the CARLA repository root, the exact versions used in the MONICA
-validation environment are listed in `requirements.txt`:
+The exact versions validated in the MONICA environment are in
+requirements.txt:
 
-```bash
+~~~bash
+conda activate monica
 python -m pip install -r requirements.txt
 python -m pip install -e . --no-deps
-```
+~~~
 
-The lock file records the CUDA 12.1 PyTorch pair used for validation. For a
-different CPU/CUDA target, install a matching `torch`/`torchaudio` pair
-together and update those two entries accordingly.
+The lock file records the CUDA 12.1 PyTorch and torchaudio pair used for
+validation. Replace those two packages as a matched pair for another target.
 
 ## Dataset CSV
 
-Training and evaluation CSV files must contain at least:
+Training, evaluation, and batch inference manifests require:
 
-```text
+~~~text
 full_path,label
 audio/example_real.wav,0
 audio/example_fake.wav,1
-```
+~~~
 
-An optional `source` column identifies the generator. Keep private datasets and their manifests outside this repository. The files in `data/examples/` are placeholders only.
+An optional source column can identify a generator. Keep private audio and
+manifests outside this repository. Files under data/examples/ are placeholders.
 
 ## R0 and R1
 
-R0 trains the clean FREYA-NF v1 density model:
+R0 is the clean baseline. It trains the shared fusion and density-flow model
+without waveform RandAugment.
 
-```bash
+R1 uses the same four encoders, fusion topology, and density-flow contract. It
+starts from R0 and applies real-only waveform RandAugment during training to
+improve robustness to recording and transmission conditions. R1 adds no new
+public encoder branch.
+
+Train R0:
+
+~~~bash
 scripts/train_r0.sh \
-  --train-csv $DATA_ROOT/train.csv \
-  --val-csv $DATA_ROOT/validation.csv \
+  --train-csv /path/to/train.csv \
+  --val-csv /path/to/validation.csv \
   --out_dir runs/r0
-```
+~~~
 
-R1 uses the same model framework and real-only RandAugment during training:
+Train R1 from R0:
 
-```bash
+~~~bash
 scripts/train_r1.sh \
   --base runs/r0/carla_r0_best.pt \
-  --train-csv $DATA_ROOT/real_train.csv \
-  --val-csv $DATA_ROOT/real_validation.csv \
+  --train-csv /path/to/real_train.csv \
+  --val-csv /path/to/real_validation.csv \
   --out-dir runs/r1
-```
+~~~
 
-Configure optional noise and room-response directories in a local copy of `config/r1.yaml` when those resources are available. Do not commit the resources or their manifests.
+Optional resource directories can be set in a local copy of config/r1.yaml.
+Do not commit those resources or their manifests.
 
-Evaluate a checkpoint on a CSV split:
+## Evaluation
 
-```bash
+CSV evaluation:
+
+~~~bash
 scripts/test_model.sh \
-  --base runs/r1/carla_r1_best.pt \
-  --csv $DATA_ROOT/test.csv \
-  --out runs/r1/test.jsonl
-```
+  --base weights/carla_r1_final.pt \
+  --csv /path/to/test.csv \
+  --out /tmp/carla_r1_test.jsonl \
+  --device cuda:0
+~~~
 
-The final public base checkpoints are included in `weights/`. They were
-publicized with portable paths and contain no optimizer state or experiment
-logs. For one audio file:
+One audio file:
 
-```bash
+~~~bash
 scripts/test_single_audio.py \
   --checkpoint weights/carla_r1_final.pt \
-  --audio $DATA_ROOT/example.wav \
+  --audio /path/to/example.wav \
   --device cuda:0
-```
+~~~
 
-For a batch CSV, following the same `full_path,label` contract as SOFIA:
+Batch audio:
 
-```bash
+~~~bash
 scripts/test_batch_audio.py \
   --checkpoint weights/carla_r1_final.pt \
-  --csv $DATA_ROOT/test.csv \
-  --output /tmp/carla_r1_test.jsonl \
+  --csv /path/to/test.csv \
+  --output /tmp/carla_r1_batch.jsonl \
   --device cuda:0
-```
+~~~
 
-Both commands use the external SOFIA encoders through `SOFIA_ROOT`. The batch
-result should be written outside the repository; `--output` is intentionally
-explicit so runtime predictions are not committed with the source tree.
+The inference outputs are written outside the repository. Both audio scripts
+use the full_path,label contract and the four external encoder branches.
+Embedding caches are local runtime artifacts and should remain outside Git.
 
-Embedding caches can be built with `scripts/build_csv_embedding_cache.py`; cache files are local runtime artifacts and are ignored by Git.
+## Support-only adaptation
 
-## Support-only LoRA
-
-The public Stage-2 path adapts a frozen R0 or R1 checkpoint using support data only:
-
-```bash
+~~~bash
 scripts/train_lora.sh \
-  --base runs/r1/carla_r1_best.pt \
-  --support $DATA_ROOT/support.csv \
+  --base weights/carla_r1_final.pt \
+  --support /path/to/support.csv \
   --generator example-generator \
-  --out-dir runs/lora/example-generator
-```
+  --out-dir /tmp/carla_lora/example-generator
+~~~
 
-Validation and test splits must not be supplied to this support-only candidate trainer. The cumulative bank evaluator is available as:
-
-```bash
-python -m freya_pro.eval.bank --help
-```
+Validation and test splits must not be passed to this support-only trainer.
 
 ## Layout
 
-- `freya_pro/models/`: R0/R1 model and checkpoint code
-- `freya_pro/data/`: CSV, audio, RandAugment, and embedding-cache utilities
-- `freya_pro/fewshot/`: support-only LoRA training
-- `freya_pro/eval/`: metrics, single-adapter evaluation, and bank routing
-- `config/`: portable public configurations
-- `scripts/`: main training, testing, and cache entry points
-- `tests/`: dependency-light public contract tests
+- carla/models/: R0/R1 model, fusion, density flow, and checkpoint code
+- carla/data/: CSV, audio, augmentation, and embedding-cache utilities
+- carla/fewshot/: support-only LoRA training
+- carla/eval/: metrics and checkpoint evaluation
+- config/: portable R0/R1 configurations
+- scripts/: training, testing, and cache entry points
+- tests/: public contract tests
+- weights/: final public R0/R1 checkpoints
 
-No personal paths, private data, intermediate results, or execution logs should be committed. The only model weights tracked in this public release are the two explicitly named final R0/R1 checkpoints under `weights/`.
+Do not commit personal paths, private data, runtime outputs, caches, or logs.

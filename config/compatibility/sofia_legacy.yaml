@@ -1,4 +1,4 @@
-# Reproduce the official SOFIA-compatible feature initialization.
+# Reproduce the SOFIA-compatible feature initialization.
 extends: ../r0.yaml
 
 encoder_compatibility:

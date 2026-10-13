@@ -311,7 +311,7 @@ class RandAugmentWaveformDataset(Dataset):
                 clean, int(sample_rate), self.target_sample_rate
             )
             sample_rate = self.target_sample_rate
-        # Match the SOFIA/FREYA-NF base preprocessing path exactly.
+        # Match the SOFIA/CARLA base preprocessing path exactly.
         if self.normalize_clean:
             clean = clean / clean.abs().amax().clamp_min(1e-9)
         item_seed = self._item_seed(index)

@@ -52,7 +52,7 @@ def threshold_at_target_fpr(
 ) -> tuple[float, float]:
     """Calibrate a real-only operating point with a deterministic FPR cap.
 
-    FREYA scores increase toward real. A track is called synthetic when
+    CARLA scores increase toward real. A track is called synthetic when
     ``score < threshold``. The threshold is selected from real validation
     scores so the empirical false-positive rate is no larger than
     ``target_fpr``; the second return value is the achieved validation FPR.
@@ -96,7 +96,7 @@ def eer(scores: Sequence[float], labels: Sequence[int]) -> float | None:
 def auroc_ai(scores: Sequence[float], labels: Sequence[int]) -> float | None:
     """AUROC with synthetic (label 1) as the positive class.
 
-    FREYA scores increase toward real, so the ranking score for this metric is
+    CARLA scores increase toward real, so the ranking score for this metric is
     ``-score``.  A single-class group has no defined AUROC.
     """
     scores, labels = _as_arrays(scores, labels)
@@ -132,7 +132,7 @@ def binary_metrics(
     *,
     threshold: float | None = None,
 ) -> dict[str, float | None]:
-    """Metrics for FREYA scores where larger score means more real.
+    """Metrics for CARLA scores where larger score means more real.
 
     ``label=1`` is synthetic. ``f1``/``f1_ai`` are therefore the primary
     synthetic-positive binary F1; ``macro_f1`` is retained only as a named

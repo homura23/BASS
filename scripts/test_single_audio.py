@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run CARLA inference for one audio file using the official SOFIA encoders.
+"""Run CARLA inference for one audio file using the external SOFIA encoders.
 
 The temporary one-row manifest is created outside the repository and removed
 automatically. The command prints one JSON object and does not write results
@@ -53,14 +53,14 @@ def main() -> None:
 
     import torch
 
-    from freya_pro.data.dataset import make_audio_loader
-    from freya_pro.models.loader import load_pro_checkpoint
-    from freya_pro.utils.config import resolve_device
-    from freya_pro.utils.run_io import public_path, sha256_file
-    from freya_pro.utils.sofia_bridge import build_encoders, encoder_device
+    from carla.data.dataset import make_audio_loader
+    from carla.models.loader import load_carla_checkpoint
+    from carla.utils.config import resolve_device
+    from carla.utils.run_io import public_path, sha256_file
+    from carla.utils.sofia_bridge import build_encoders, encoder_device
 
     device = resolve_device(args.device)
-    model, cfg = load_pro_checkpoint(str(checkpoint), device)
+    model, cfg = load_carla_checkpoint(str(checkpoint), device)
     model.eval()
 
     # Keep the manifest ephemeral: it is only an adapter to SOFIA's official

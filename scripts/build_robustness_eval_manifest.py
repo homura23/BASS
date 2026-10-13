@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from freya_pro.data.manifest import derive_seed
-from freya_pro.utils.config import load_config
+from carla.data.manifest import derive_seed
+from carla.utils.config import load_config
 
 
 def _label(value: object) -> int:

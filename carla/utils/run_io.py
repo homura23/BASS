@@ -141,7 +141,7 @@ def bank_fingerprint_from_hashes(base_sha256: str, lora_sha256: list[str]) -> st
 def source_tree_fingerprint(root: str | Path | None = None) -> dict[str, Any]:
     project = Path(root) if root is not None else Path(__file__).resolve().parents[2]
     files: set[Path] = set(project.glob("*.py"))
-    for directory, suffixes in (("freya_pro", {".py"}), ("scripts", {".py", ".sh"}),
+    for directory, suffixes in (("carla", {".py"}), ("scripts", {".py", ".sh"}),
                                 ("config", {".yaml", ".yml"})):
         base = project / directory
         if base.is_dir():

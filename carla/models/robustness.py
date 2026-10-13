@@ -1,7 +1,7 @@
 """R0/R1 fusion wrapper.
 
-CARLA exposes two model versions: R0 is the clean FREYA-NF v1 base and R1
-uses the same base with real-only RandAugment during training. The versions
+CARLA exposes two release versions: R0 is the clean baseline and R1 uses
+the same model with real-only RandAugment during training. The versions
 differ by training protocol, not by an additional canonicalizer topology.
 """
 from __future__ import annotations

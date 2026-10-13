@@ -1,4 +1,4 @@
-"""FREYA-NF v1 density model used by CARLA R0 and R1."""
+"""CARLA density model used by the R0 and R1 release variants."""
 from __future__ import annotations
 
 from typing import Dict, Optional
@@ -10,8 +10,8 @@ from .flow import VectorGlow
 from .robustness import FusionWrapper
 
 
-class FreyaPro(nn.Module):
-    """Compose SOFIA fusion with the FREYA-NF v1 density flow."""
+class CarlaModel(nn.Module):
+    """Compose external encoder fusion with the CARLA density flow."""
 
     def __init__(self, fusion: FusionWrapper, flow: VectorGlow) -> None:
         super().__init__()

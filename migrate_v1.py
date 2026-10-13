@@ -1,11 +1,11 @@
-"""Convert an existing FREYA-NF v1 checkpoint to a CARLA R0 checkpoint."""
+"""Convert an existing CARLA R0/R1 checkpoint to a CARLA R0 checkpoint."""
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
-from freya_pro.models.loader import load_base_v1, save_pro_checkpoint
-from freya_pro.utils.config import load_config, resolve_device
+from carla.models.loader import load_base_v1, save_carla_checkpoint
+from carla.utils.config import load_config, resolve_device
 
 
 def main() -> None:
@@ -20,7 +20,7 @@ def main() -> None:
     model = load_base_v1(args.source, cfg, resolve_device(args.device), "r0")
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    save_pro_checkpoint(str(out), model, cfg, stage="migrated_base", epoch=0)
+    save_carla_checkpoint(str(out), model, cfg, stage="migrated_base", epoch=0)
     print(f"migrated={out}")
 
 

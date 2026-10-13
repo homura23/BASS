@@ -14,7 +14,7 @@ from ..data.embedding_cache import (
     embedding_cache_artifact_sha256, make_embedding_cache_loader,
 )
 from ..eval.metrics import binary_metrics
-from ..models.loader import load_pro_checkpoint
+from ..models.loader import load_carla_checkpoint
 from ..models.lora import checkpoint_sha256, inject_lora, lora_state_dict
 from ..utils.config import resolve_device
 from ..utils.run_io import public_path, start_telemetry, telemetry_snapshot, torch_save_atomic
@@ -144,7 +144,7 @@ def main() -> None:
         raise ValueError(f"Support/validation identity overlap: {len(overlap)}")
     device = resolve_device(args.device)
     telemetry = start_telemetry(device)
-    model, cfg = load_pro_checkpoint(args.base, device)
+    model, cfg = load_carla_checkpoint(args.base, device)
     model.eval()
     model.freeze_base()
     for parameter in model.robust_fusion.robustness_parameters():

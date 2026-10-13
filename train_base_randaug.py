@@ -15,18 +15,18 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from freya_pro.data.corruptions import AudioRandAugment
-from freya_pro.data.dataset import make_pair_loader, make_randaug_loader
-from freya_pro.data.embedding_cache import validate_stage1_randaugment_cache_metadata
-from freya_pro.models.loader import load_base_v1, load_pro_checkpoint, save_pro_checkpoint
-from freya_pro.models.lora import checkpoint_sha256
-from freya_pro.utils.config import load_config, resolve_device
-from freya_pro.utils.run_io import (
+from carla.data.corruptions import AudioRandAugment
+from carla.data.dataset import make_pair_loader, make_randaug_loader
+from carla.data.embedding_cache import validate_stage1_randaugment_cache_metadata
+from carla.models.loader import load_base_v1, load_carla_checkpoint, save_carla_checkpoint
+from carla.models.lora import checkpoint_sha256
+from carla.utils.config import load_config, resolve_device
+from carla.utils.run_io import (
     append_jsonl, capture_rng_state, environment_manifest, public_path, restore_rng_state,
     prune_epoch_checkpoints, sha256_file, start_telemetry, telemetry_snapshot,
     utc_now, write_json_atomic,
 )
-from freya_pro.utils.sofia_bridge import build_encoders, encoder_device
+from carla.utils.sofia_bridge import build_encoders, encoder_device
 
 
 @torch.no_grad()
@@ -107,7 +107,7 @@ def run_epoch(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
-    parser.add_argument("--base", required=True, help="FREYA-NF v1 checkpoint")
+    parser.add_argument("--base", required=True, help="CARLA R0/R1 checkpoint")
     parser.add_argument("--train-csv", required=True, help="Real-only training CSV")
     parser.add_argument("--val-csv", required=True, help="Real-only validation CSV")
     parser.add_argument("--seed", type=int, default=None)
@@ -158,7 +158,7 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     resume_state = torch.load(args.resume, map_location="cpu") if args.resume else None
     if args.resume:
-        model, checkpoint_cfg = load_pro_checkpoint(args.resume, device)
+        model, checkpoint_cfg = load_carla_checkpoint(args.resume, device)
         if checkpoint_cfg != cfg or resume_state.get("stage") != "base_randaug":
             raise ValueError("Resume checkpoint config/stage mismatch")
         if Path(args.resume).resolve().parent != output_dir:
@@ -329,7 +329,7 @@ def main() -> None:
                      "best_validation_loss": best, "is_best": improved,
                      "runtime": telemetry_snapshot(telemetry, device)})
         training_state = {"rng": capture_rng_state()}
-        save_pro_checkpoint(
+        save_carla_checkpoint(
             str(output_dir / f"carla_r1_epoch{epoch}.pt"),
             model,
             cfg,
@@ -338,7 +338,7 @@ def main() -> None:
             metadata=metadata, optimizer=optimizer, training_state=training_state,
         )
         if improved:
-            save_pro_checkpoint(
+            save_carla_checkpoint(
                 str(output_dir / "carla_r1_best.pt"),
                 model,
                 cfg,

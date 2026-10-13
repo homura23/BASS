@@ -14,7 +14,7 @@ from .finetune import (
 )
 from ..data.corruptions import AudioRandAugment, default_operation_specs
 from ..data.dataset import make_audio_loader, make_randaug_loader
-from ..models.loader import load_pro_checkpoint
+from ..models.loader import load_carla_checkpoint
 from ..models.lora import checkpoint_sha256, inject_lora, lora_state_dict
 from ..utils.config import load_config, resolve_device
 from ..utils.run_io import (
@@ -154,7 +154,7 @@ def main() -> None:
             raise ValueError("R1-only support CSV must contain exactly 50 real and 50 fake rows")
     device = resolve_device(args.device)
     telemetry = start_telemetry(device)
-    model, cfg = load_pro_checkpoint(args.base, device)
+    model, cfg = load_carla_checkpoint(args.base, device)
     lora_targets = tuple(cfg["fewshot"]["lora"]["targets"])
     if args.lora_targets:
         lora_targets = tuple(

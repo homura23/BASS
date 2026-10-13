@@ -511,13 +511,13 @@ def pitch_shift(
 ) -> torch.Tensor:
     audio = _require_torchaudio()
     waveform = ensure_stereo(waveform)
-    n_fft = int(n_fft or os.environ.get("FREYA_PITCH_SHIFT_N_FFT", "1024"))
+    n_fft = int(n_fft or os.environ.get("CARLA_PITCH_SHIFT_N_FFT", "1024"))
     if n_fft <= 0:
         raise ValueError("n_fft must be positive")
     win_length = win_length or n_fft
     hop_length = hop_length or n_fft // 4
     # The R1 RandAugment window is already model-native in duration. Use the
-    # FREYA CPU setting (1024/256) so pitchshift cannot dominate a loader
+    # CARLA CPU setting (1024/256) so pitchshift cannot dominate a loader
     # worker; the operation remains torchaudio's length-preserving pitch shift.
     with torch.no_grad():
         return audio.functional.pitch_shift(
@@ -639,7 +639,7 @@ def codec_roundtrip(
         # activated Conda PATH. Prefer the launcher-provided absolute path,
         # then the bin directory next to the running Python interpreter.
         candidates = [
-            os.environ.get("FREYA_FFMPEG_BIN", ""),
+            os.environ.get("CARLA_FFMPEG_BIN", ""),
             str(Path(sys.executable).resolve().parent / "ffmpeg"),
         ]
         for candidate in candidates:
@@ -657,7 +657,7 @@ def codec_roundtrip(
     if codec not in codec_map:
         raise ValueError(f"Unsupported codec: {codec}")
     encoder, suffix = codec_map[codec]
-    with tempfile.TemporaryDirectory(prefix="freya_codec_") as directory:
+    with tempfile.TemporaryDirectory(prefix="carla_codec_") as directory:
         directory = Path(directory)
         source = directory / "input.wav"
         target = directory / f"output{suffix}"

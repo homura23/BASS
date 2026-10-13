@@ -14,9 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from freya_pro.data.dataset import make_audio_loader
-from freya_pro.utils.config import load_config
-from freya_pro.utils.run_io import public_path, write_json_atomic
+from carla.data.dataset import make_audio_loader
+from carla.utils.config import load_config
+from carla.utils.run_io import public_path, write_json_atomic
 
 
 def read_rows(path: str) -> list[dict[str, str]]:

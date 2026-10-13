@@ -1,4 +1,4 @@
-"""Train the clean-real CARLA R0 FREYA-NF v1 base."""
+"""Train the clean CARLA R0 density model."""
 from __future__ import annotations
 
 import argparse
@@ -10,18 +10,18 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from freya_pro.data.dataset import make_audio_loader
-from freya_pro.data.embedding_cache import make_embedding_cache_loader
-from freya_pro.data.embedding_cache import embedding_cache_artifact_sha256
-from freya_pro.eval.metrics import binary_metrics
-from freya_pro.models.loader import build_model, load_pro_checkpoint, save_pro_checkpoint
-from freya_pro.utils.config import load_config, resolve_device
-from freya_pro.utils.run_io import (
+from carla.data.dataset import make_audio_loader
+from carla.data.embedding_cache import make_embedding_cache_loader
+from carla.data.embedding_cache import embedding_cache_artifact_sha256
+from carla.eval.metrics import binary_metrics
+from carla.models.loader import build_model, load_carla_checkpoint, save_carla_checkpoint
+from carla.utils.config import load_config, resolve_device
+from carla.utils.run_io import (
     append_jsonl, capture_rng_state, environment_manifest, public_path, restore_rng_state,
     prune_epoch_checkpoints, sha256_file, start_telemetry, telemetry_snapshot,
     utc_now, write_json_atomic,
 )
-from freya_pro.utils.sofia_bridge import build_encoders, encoder_device, set_requires_grad
+from carla.utils.sofia_bridge import build_encoders, encoder_device, set_requires_grad
 
 
 @torch.no_grad()
@@ -158,7 +158,7 @@ def main() -> None:
     resume_state = None
     if args.resume:
         resume_state = torch.load(args.resume, map_location="cpu")
-        model, checkpoint_cfg = load_pro_checkpoint(args.resume, device)
+        model, checkpoint_cfg = load_carla_checkpoint(args.resume, device)
         if checkpoint_cfg != cfg:
             raise ValueError("Resume checkpoint resolved config does not match requested config")
         if resume_state.get("stage") != "base":
@@ -317,13 +317,13 @@ def main() -> None:
         }
         append_jsonl(metrics_path, log_row)
         training_state = {"rng": capture_rng_state()}
-        save_pro_checkpoint(
+        save_carla_checkpoint(
             str(out_dir / f"carla_r0_epoch{epoch}.pt"),
             model, cfg, stage="base", epoch=epoch, metadata=metadata,
             optimizer=optimizer, training_state=training_state,
         )
         if improved:
-            save_pro_checkpoint(
+            save_carla_checkpoint(
                 str(out_dir / "carla_r0_best.pt"),
                 model, cfg, stage="base", epoch=epoch, metadata=metadata,
             )

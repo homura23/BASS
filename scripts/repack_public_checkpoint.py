@@ -2,7 +2,7 @@
 """Repackage one internal v1 checkpoint as a portable CARLA release artifact.
 
 The source checkpoint is never copied verbatim: optimizer state, experiment
-metadata, private CSV/cache paths, and the FREYA-PRO project identifier are
+metadata, private CSV/cache paths, and the CARLA project identifier are
 removed. Only the R0/R1 fusion and flow weights plus their portable inference
 configuration are retained.
 """
@@ -20,8 +20,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from freya_pro.utils.config import load_config  # noqa: E402
-from freya_pro.utils.run_io import sha256_file, torch_save_atomic  # noqa: E402
+from carla.utils.config import load_config  # noqa: E402
+from carla.utils.run_io import sha256_file, torch_save_atomic  # noqa: E402
 
 
 def portable_config(source: dict, public: dict, version: str) -> dict:

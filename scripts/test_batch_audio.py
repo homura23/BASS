@@ -37,7 +37,7 @@ def main() -> None:
 
     # Keep the implementation in the tested CARLA evaluator so this wrapper
     # and the existing training/evaluation entry point cannot drift apart.
-    import freya_pro.eval.evaluate as evaluator
+    import carla.eval.evaluate as evaluator
 
     forwarded = [
         "--base", args.checkpoint,

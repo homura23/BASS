@@ -1,16 +1,30 @@
-# SOFIA dependency contract
+# External encoder dependency
 
-CARLA treats SOFIA as an external checkout. Set SOFIA_ROOT to the checkout, or place the checkout next to the CARLA directory as `../sofia`.
+CARLA uses encoder wrappers and pretrained resources from an external SOFIA
+checkout. CARLA does not redistribute that source tree, pretrained weights, or
+local caches.
 
-The public CARLA configuration never stores a machine-specific SOFIA path. The bridge resolves the following values relative to `SOFIA_ROOT`:
+Set SOFIA_ROOT to the checkout, or place it next to CARLA as ../sofia:
 
-- FXEncoder++ repository and default checkpoint
-- MuQ repository and weight directory
-- MERT checkpoint directory
-- wav2vec checkpoint directory
+~~~bash
+export SOFIA_ROOT=/path/to/sofia
+~~~
 
-The exact repositories, weight files, and installation steps are maintained by the official SOFIA project:
+CARLA resolves these paths relative to SOFIA_ROOT:
 
-https://github.com/homura23/SOFIA#readme
+- FxEncoder++: third_party/fxencoder_plusplus/fxenc_plusplus_default.pt
+- MuQ: third_party/muq_weights/model.safetensors and pytorch_model.bin
+- MERT: third_party/mert/pytorch_model.bin and MERT-v1-95M_fairseq.pt
+- Wav2Vec2: third_party/wav2vec/pytorch_model.bin
 
-CARLA does not copy SOFIA source files, checkpoints, or local dependency caches. This keeps the repository small and prevents external model artifacts from being redistributed accidentally.
+The active branches are FxEncoder++, MuQ, MERT, and Wav2Vec2. Their inputs
+are stereo 44.1 kHz, mono 24 kHz, mono 24 kHz, and mono 16 kHz. Their output
+sizes are 128, 1024, 768, and 768 dimensions.
+
+The CARLA bridge loads the frozen branches, sends their embeddings to the
+multi-branch fusion module, and scores the fused representation with the CARLA
+density flow. R0 and R1 use the same encoder contract. R0 is clean baseline
+training; R1 starts from R0 and uses real-only waveform RandAugment.
+
+Released configurations use relative paths only. Set SOFIA_ROOT instead of
+editing a CARLA config when the external checkout is elsewhere.

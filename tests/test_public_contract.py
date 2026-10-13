@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import yaml
 
-from freya_pro.models.robustness import FusionWrapper
+from carla.models.robustness import FusionWrapper
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

@@ -14,7 +14,7 @@ from ..data.dataset import make_audio_loader
 from ..data.embedding_cache import (
     build_csv_embedding_cache, load_csv_embedding_cache, save_embedding_cache,
 )
-from ..models.loader import load_pro_checkpoint
+from ..models.loader import load_carla_checkpoint
 from ..models.lora import load_lora_checkpoint, remove_lora
 from ..utils.config import resolve_device
 from ..utils.run_io import (
@@ -185,7 +185,7 @@ def main() -> None:
         generators = list(components["generators"])
     else:
         device = resolve_device(args.device)
-        model, cfg = load_pro_checkpoint(args.base, device)
+        model, cfg = load_carla_checkpoint(args.base, device)
         crop_mode = args.crop_mode or str(
             cfg.get("data", {}).get("eval_crop_mode", "center")
         )
