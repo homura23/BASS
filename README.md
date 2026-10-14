@@ -76,9 +76,6 @@ python -m pip install -r requirements.txt
 python -m pip install -e . --no-deps
 ~~~
 
-The lock file records the CUDA 12.1 PyTorch and torchaudio pair used for
-validation. Replace those two packages as a matched pair for another target.
-
 ## Dataset CSV
 
 Training, evaluation, and batch inference manifests require:
@@ -88,9 +85,6 @@ full_path,label
 audio/example_real.wav,0
 audio/example_fake.wav,1
 ~~~
-
-An optional source column can identify a generator. Keep private audio and
-manifests outside this repository. Files under data/examples/ are placeholders.
 
 ## R0 and R1
 
@@ -116,9 +110,6 @@ scripts/train_r1.sh \
   --val-csv data/real_validation.csv \
   --out-dir runs/r1
 ~~~
-
-Optional resource directories can be set in a local copy of config/r1.yaml.
-Do not commit those resources or their manifests.
 
 ## Evaluation
 
@@ -153,6 +144,10 @@ scripts/test_batch_audio.py \
 
 ## Support-only adaptation
 
+Support-only adaptation is a lightweight way to adapt an existing CARLA R0
+or R1 checkpoint to a target domain or generator using a small support set.
+It updates the adaptation parameters while preserving the base CARLA model.
+
 ~~~bash
 scripts/train_lora.sh \
   --base weights/carla_r1_final.pt \
@@ -160,8 +155,6 @@ scripts/train_lora.sh \
   --generator example-generator \
   --out-dir runtime_outputs/carla_lora/example-generator
 ~~~
-
-Validation and test splits must not be passed to this support-only trainer.
 
 ## Layout
 
