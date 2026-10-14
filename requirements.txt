@@ -1,4 +1,4 @@
-# CARLA dependency lock for the MONICA environment.
+# CARLA dependency lock for the CARLA environment.
 #
 # Tested with:
 #   Python 3.10.20
@@ -6,7 +6,7 @@
 #   torchaudio 2.5.1+cu121
 #
 # Install the matching PyTorch/torchaudio pair before running CARLA. The
-# +cu121 suffix records the exact MONICA wheel; replace the pair together when
+# +cu121 suffix records the exact CARLA validation wheel; replace the pair together when
 # using another CUDA or CPU build.
 
 torch==2.5.1

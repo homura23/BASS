@@ -4,10 +4,6 @@ CARLA is a public audio deepfake detection pipeline. It contains the R0/R1
 model framework, training and evaluation entry points, frozen-encoder cache
 utilities, and support-only adaptation code.
 
-Private datasets, manifests, execution logs, intermediate caches, experiment
-reports, ablation variants, and paper-result tables are excluded. Only the
-final public R0 and R1 base checkpoints are stored in weights/.
-
 ## Encoder architecture
 
 CARLA uses four frozen audio encoder branches during feature extraction. The
@@ -28,12 +24,24 @@ four branches only.
 
 ## External encoder setup
 
-CARLA does not vendor the external encoder source or pretrained files. Place a
-SOFIA checkout next to this repository as ../sofia, or set SOFIA_ROOT:
+CARLA does not vendor the external encoder source or pretrained files. The
+external SOFIA checkout is expected as a sibling directory of CARLA:
+
+~~~text
+CARLA/
+../sofia/
+~~~
+
+From the CARLA repository root, set:
 
 ~~~bash
 export SOFIA_ROOT=../sofia
 ~~~
+
+SOFIA_ROOT is the root directory used by carla/utils/sofia_bridge.py to
+locate the external encoder wrappers and pretrained files. The paths below
+are resolved relative to SOFIA_ROOT; they are not paths inside CARLA. If
+SOFIA_ROOT is not set, the bridge uses the sibling ../sofia directory.
 
 These paths must exist relative to SOFIA_ROOT:
 
@@ -50,13 +58,20 @@ CARLA resolves these paths through SOFIA_ROOT. The public checkpoints use the
 checkpoint_repaired encoder compatibility mode. Install the external
 checkout's Python dependencies and model files before inference.
 
+Download references:
+
+- fx: https://huggingface.co/yytung/fxencoder-plusplus/tree/main
+- muq: https://huggingface.co/OpenMuQ/MuQ-MuLan-large
+- mert: https://huggingface.co/m-a-p/MERT-v1-95M
+- wave2: https://huggingface.co/facebook/wav2vec2-base
+
 ## Install
 
-The exact versions validated in the MONICA environment are in
+The exact versions validated in the CARLA environment are in
 requirements.txt:
 
 ~~~bash
-conda activate monica
+conda activate carla
 python -m pip install -r requirements.txt
 python -m pip install -e . --no-deps
 ~~~
@@ -79,13 +94,9 @@ manifests outside this repository. Files under data/examples/ are placeholders.
 
 ## R0 and R1
 
-R0 is the clean baseline. It trains the shared fusion and density-flow model
-without waveform RandAugment.
+R0 means CARLA without audio RandAugment during training stage.
 
-R1 uses the same four encoders, fusion topology, and density-flow contract. It
-starts from R0 and applies real-only waveform RandAugment during training to
-improve robustness to recording and transmission conditions. R1 adds no new
-public encoder branch.
+R1 means CARLA with RandAugment to improve robustness to audio corruptions.
 
 Train R0:
 
@@ -140,10 +151,6 @@ scripts/test_batch_audio.py \
   --device cuda:0
 ~~~
 
-The inference outputs use the ignored runtime_outputs/ directory and are not committed. Both audio scripts
-use the full_path,label contract and the four external encoder branches.
-Embedding caches are local runtime artifacts and should remain outside Git.
-
 ## Support-only adaptation
 
 ~~~bash
@@ -166,5 +173,3 @@ Validation and test splits must not be passed to this support-only trainer.
 - scripts/: training, testing, and cache entry points
 - tests/: public contract tests
 - weights/: final public R0/R1 checkpoints
-
-Do not commit personal paths, private data, runtime outputs, caches, or logs.
